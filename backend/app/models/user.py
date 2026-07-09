@@ -1,6 +1,7 @@
-from sqlalchemy import Boolean, Enum, String
+import uuid
 
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy import Boolean, Enum, String
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.enums.user_role import UserRole
 from app.models.base_model import BaseModel
@@ -41,4 +42,9 @@ class User(BaseModel):
         Boolean,
         default=True,
         nullable=False,
+    )
+
+    firms: Mapped[list["Firm"]] = relationship(
+        "Firm",
+        back_populates="owner",
     )
