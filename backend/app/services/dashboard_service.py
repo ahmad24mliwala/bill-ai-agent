@@ -2,17 +2,45 @@ from uuid import UUID
 
 from sqlalchemy.orm import Session
 
-from app.repositories.invoice_repository import InvoiceRepository
+from app.repositories.analytics_repository import AnalyticsRepository
 
 
 class DashboardService:
 
-    def __init__(self, db: Session):
-        self.repository = InvoiceRepository(db)
+    def __init__(
+        self,
+        db: Session,
+    ):
+        self.repository = AnalyticsRepository(db)
 
     def get_dashboard(
         self,
         user_id: UUID,
-    ) -> dict:
+    ):
 
-        return self.repository.get_dashboard_stats(user_id)
+        return {
+            "summary":
+                self.repository.get_summary(
+                    user_id
+                ),
+
+            "monthly_trend":
+                self.repository.get_monthly_trend(
+                    user_id
+                ),
+
+            "gst_distribution":
+                self.repository.get_gst_distribution(
+                    user_id
+                ),
+
+            "top_vendors":
+                self.repository.get_top_vendors(
+                    user_id
+                ),
+
+            "recent_invoices":
+                self.repository.get_recent_invoices(
+                    user_id
+                ),
+        }
