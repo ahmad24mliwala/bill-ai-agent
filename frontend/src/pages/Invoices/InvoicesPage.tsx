@@ -1,9 +1,16 @@
-import { useEffect, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useState,
+} from "react";
+
 import toast from "react-hot-toast";
 
 import Layout from "../../components/layout/Layout";
 
 import {
+  deleteAllInvoices,
+  deleteInvoice,
   getInvoices,
 } from "../../api/invoices";
 
@@ -50,9 +57,12 @@ export default function InvoicesPage() {
 
   const pageSize = 10;
 
-  useEffect(() => {
+  // ==========================================
+  // Load Invoices
+  // ==========================================
 
-    async function loadInvoices() {
+  const loadInvoices = useCallback(
+    async () => {
 
       try {
 
@@ -98,17 +108,96 @@ export default function InvoicesPage() {
 
       }
 
-    }
+    },
+    [
+      debouncedSearch,
+      vendor,
+      gstMatch,
+      dateFrom,
+      dateTo,
+    ]
+  );
+
+  useEffect(() => {
 
     loadInvoices();
 
-  }, [
-    debouncedSearch,
-    vendor,
-    gstMatch,
-    dateFrom,
-    dateTo,
-  ]);
+  }, [loadInvoices]);
+
+  // ==========================================
+  // Delete One
+  // ==========================================
+
+  async function handleDelete(
+    invoiceId: string,
+  ) {
+
+    try {
+
+      await deleteInvoice(
+        invoiceId,
+      );
+
+      toast.success(
+        "Invoice deleted successfully."
+      );
+
+      loadInvoices();
+
+    } catch (error) {
+
+      console.error(error);
+
+      toast.error(
+        "Unable to delete invoice."
+      );
+
+    }
+
+  }
+
+  // ==========================================
+  // Delete All
+  // ==========================================
+
+  async function handleDeleteAll() {
+
+    const confirmed =
+      window.confirm(
+        "Delete ALL invoices?\n\nThis action cannot be undone."
+      );
+
+    if (!confirmed) {
+
+      return;
+
+    }
+
+    try {
+
+      await deleteAllInvoices();
+
+      toast.success(
+        "All invoices deleted successfully."
+      );
+
+      loadInvoices();
+
+    } catch (error) {
+
+      console.error(error);
+
+      toast.error(
+        "Unable to delete invoices."
+      );
+
+    }
+
+  }
+
+  // ==========================================
+  // Clear Filters
+  // ==========================================
 
   function clearFilters() {
 
@@ -146,25 +235,42 @@ export default function InvoicesPage() {
 
       <div className="space-y-8">
 
-        {/* Header */}
+        {/* =======================================
+                    Header
+        ======================================= */}
 
-        <div>
+        <div className="flex items-center justify-between">
 
-          <h1 className="text-3xl font-bold text-slate-800">
+          <div>
 
-            📄 Invoice Management
+            <h1 className="text-3xl font-bold text-slate-800">
 
-          </h1>
+              📄 Invoice Management
 
-          <p className="mt-2 text-gray-500">
+            </h1>
 
-            Search, review and manage all AI processed invoices.
+            <p className="mt-2 text-gray-500">
 
-          </p>
+              Search, review and manage all AI processed invoices.
+
+            </p>
+
+          </div>
+
+          <button
+            onClick={handleDeleteAll}
+            className="rounded-xl bg-red-600 px-5 py-3 font-semibold text-white transition hover:bg-red-700"
+          >
+
+            🗑 Delete All
+
+          </button>
 
         </div>
 
-        {/* Filters */}
+        {/* =======================================
+                    Filters
+        ======================================= */}
 
         <InvoiceFilters
 
@@ -187,7 +293,9 @@ export default function InvoicesPage() {
 
         />
 
-        {/* Content */}
+        {/* =======================================
+                    Content
+        ======================================= */}
 
         {loading ? (
 
@@ -202,7 +310,11 @@ export default function InvoicesPage() {
           <>
 
             <InvoiceTable
+
               invoices={paginatedInvoices}
+
+              onDelete={handleDelete}
+
             />
 
             <Pagination
@@ -212,19 +324,19 @@ export default function InvoicesPage() {
               totalPages={totalPages}
 
               onPrevious={() =>
-                setPage((previous) =>
+                setPage(previous =>
                   Math.max(
                     previous - 1,
-                    1
+                    1,
                   )
                 )
               }
 
               onNext={() =>
-                setPage((previous) =>
+                setPage(previous =>
                   Math.min(
                     previous + 1,
-                    totalPages
+                    totalPages,
                   )
                 )
               }

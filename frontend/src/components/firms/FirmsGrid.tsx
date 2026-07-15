@@ -5,16 +5,16 @@ import FirmCard from "./FirmCard";
 interface FirmsGridProps {
   firms: Firm[];
   onEdit: (id: string) => void;
+  onDelete: (firm: Firm) => void;
 }
 
 export default function FirmsGrid({
   firms,
   onEdit,
+  onDelete,
 }: FirmsGridProps) {
-
   return (
-
-    <div className="grid gap-6 sm:grid-cols-1 md:grid-cols-2 xl:grid-cols-3">
+    <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
 
       {firms.map((firm) => (
 
@@ -22,12 +22,11 @@ export default function FirmsGrid({
           key={firm.id}
           firm={firm}
           onEdit={onEdit}
+          onDelete={onDelete}
         />
 
       ))}
 
     </div>
-
   );
-
 }

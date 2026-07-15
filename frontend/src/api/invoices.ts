@@ -74,3 +74,21 @@ export async function updateInvoice(
 
   return response.data;
 }
+
+export async function deleteInvoice(
+  invoiceId: string
+): Promise<void> {
+
+  await api.delete(
+    `/invoices/${invoiceId}`
+  );
+
+}
+
+export async function deleteAllInvoices(): Promise<void> {
+
+  await api.delete(
+    "/invoices"
+  );
+
+}

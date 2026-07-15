@@ -4,6 +4,7 @@ import {
   MapPinIcon,
   PencilSquareIcon,
   PhoneIcon,
+  TrashIcon,
 } from "@heroicons/react/24/outline";
 
 import type { Firm } from "../../api/firms";
@@ -11,35 +12,33 @@ import type { Firm } from "../../api/firms";
 interface FirmCardProps {
   firm: Firm;
   onEdit: (id: string) => void;
+  onDelete: (firm: Firm) => void;
 }
 
 export default function FirmCard({
   firm,
   onEdit,
+  onDelete,
 }: FirmCardProps) {
   return (
-    <div className="rounded-2xl bg-white p-6 shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
+    <div className="rounded-2xl bg-white p-6 shadow transition hover:shadow-lg">
 
-      {/* Header */}
-
-      <div className="mb-6 flex items-start justify-between">
+      <div className="mb-5 flex items-start justify-between">
 
         <div className="flex items-center gap-4">
 
-          <div className="rounded-2xl bg-blue-100 p-4">
-
+          <div className="rounded-xl bg-blue-100 p-3">
             <BuildingOfficeIcon className="h-8 w-8 text-blue-600" />
-
           </div>
 
           <div>
 
-            <h2 className="text-xl font-bold text-slate-800">
+            <h2 className="text-xl font-bold">
               {firm.name}
             </h2>
 
-            <p className="mt-1 text-sm text-slate-500">
-              GST: {firm.gst_number ?? "-"}
+            <p className="text-sm text-gray-500">
+              GST : {firm.gst_number ?? "-"}
             </p>
 
           </div>
@@ -60,55 +59,40 @@ export default function FirmCard({
 
       </div>
 
-      {/* Information */}
+      <div className="space-y-3 text-sm text-gray-600">
 
-      <div className="space-y-3">
-
-        <div className="flex items-center gap-3 text-sm text-slate-600">
-
-          <PhoneIcon className="h-5 w-5 text-slate-400" />
-
-          <span>
-            {firm.phone ?? "-"}
-          </span>
-
+        <div className="flex items-center gap-3">
+          <PhoneIcon className="h-5 w-5" />
+          {firm.phone ?? "-"}
         </div>
 
-        <div className="flex items-center gap-3 text-sm text-slate-600">
-
-          <EnvelopeIcon className="h-5 w-5 text-slate-400" />
-
-          <span>
-            {firm.email ?? "-"}
-          </span>
-
+        <div className="flex items-center gap-3">
+          <EnvelopeIcon className="h-5 w-5" />
+          {firm.email ?? "-"}
         </div>
 
-        <div className="flex items-start gap-3 text-sm text-slate-600">
-
-          <MapPinIcon className="mt-0.5 h-5 w-5 text-slate-400" />
-
-          <span>
-            {firm.address ?? "-"}
-          </span>
-
+        <div className="flex items-start gap-3">
+          <MapPinIcon className="mt-0.5 h-5 w-5" />
+          {firm.address ?? "-"}
         </div>
 
       </div>
 
-      {/* Footer */}
-
-      <div className="mt-8 border-t border-slate-200 pt-5">
+      <div className="mt-8 flex gap-3">
 
         <button
           onClick={() => onEdit(firm.id)}
-          className="flex items-center rounded-xl bg-blue-600 px-5 py-2.5 font-semibold text-white transition hover:bg-blue-700"
+          className="flex flex-1 items-center justify-center rounded-xl bg-blue-600 py-3 font-semibold text-white hover:bg-blue-700"
         >
-
           <PencilSquareIcon className="mr-2 h-5 w-5" />
+          Edit
+        </button>
 
-          Edit Firm
-
+        <button
+          onClick={() => onDelete(firm)}
+          className="flex items-center justify-center rounded-xl bg-red-600 px-5 text-white hover:bg-red-700"
+        >
+          <TrashIcon className="h-5 w-5" />
         </button>
 
       </div>

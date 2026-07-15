@@ -9,9 +9,25 @@ import {
   SparklesIcon,
 } from "@heroicons/react/24/outline";
 
-import { NavLink, useNavigate } from "react-router-dom";
+import {
+  NavLink,
+  useNavigate,
+} from "react-router-dom";
+
+import {
+  useEffect,
+  useState,
+} from "react";
 
 import { useAuth } from "../../contexts/AuthContext";
+
+import {
+  getProfile,
+} from "../../api/profile";
+
+import type {
+  UserProfile,
+} from "../../api/profile";
 
 const menuItems = [
   {
@@ -47,16 +63,47 @@ const menuItems = [
 ];
 
 export default function Sidebar() {
+
   const { logout } = useAuth();
 
   const navigate = useNavigate();
 
+  const [profile, setProfile] =
+    useState<UserProfile>();
+
+  useEffect(() => {
+
+    async function loadProfile() {
+
+      try {
+
+        const data =
+          await getProfile();
+
+        setProfile(data);
+
+      } catch (error) {
+
+        console.error(error);
+
+      }
+
+    }
+
+    loadProfile();
+
+  }, []);
+
   function handleLogout() {
+
     logout();
+
     navigate("/");
+
   }
 
   return (
+
     <aside className="flex h-screen w-72 flex-col border-r border-slate-800 bg-slate-950 text-white">
 
       {/* Logo */}
@@ -73,7 +120,7 @@ export default function Sidebar() {
 
           <div>
 
-            <h1 className="text-xl font-bold tracking-wide">
+            <h1 className="text-xl font-bold">
 
               AI Bill
 
@@ -131,7 +178,7 @@ export default function Sidebar() {
 
       </nav>
 
-      {/* User Section */}
+      {/* Logged In User */}
 
       <div className="border-t border-slate-800 p-5">
 
@@ -143,9 +190,27 @@ export default function Sidebar() {
 
           </p>
 
-          <p className="mt-1 truncate font-semibold">
+          <p className="mt-2 truncate font-semibold">
 
-            AI Bill Admin
+            {
+
+              profile?.full_name ||
+
+              "Loading..."
+
+            }
+
+          </p>
+
+          <p className="truncate text-sm text-slate-400">
+
+            {
+
+              profile?.email ||
+
+              ""
+
+            }
 
           </p>
 
@@ -165,5 +230,7 @@ export default function Sidebar() {
       </div>
 
     </aside>
+
   );
+
 }

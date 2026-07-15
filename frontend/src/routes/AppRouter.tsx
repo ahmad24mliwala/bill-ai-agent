@@ -5,32 +5,51 @@ import {
 } from "react-router-dom";
 
 import DashboardPage from "../pages/Dashboard/DashboardPage";
+import ExportPage from "../pages/Export/ExportPage";
+
+import CreateFirmPage from "../pages/Firms/CreateFirmPage";
+import EditFirmPage from "../pages/Firms/EditFirmPage";
 import FirmsPage from "../pages/Firms/FirmsPage";
+
 import InvoiceDetailsPage from "../pages/InvoiceDetails/InvoiceDetailsPage";
 import InvoicesPage from "../pages/Invoices/InvoicesPage";
+
 import LoginPage from "../pages/Login/LoginPage";
+import RegisterPage from "../pages/Register/RegisterPage";
+
+import SettingsPage from "../pages/Settings/SettingsPage";
+
 import UploadInvoicePage from "../pages/Upload/UploadInvoicePage";
 
 import ProtectedRoute from "./ProtectedRoute";
 
 export default function AppRouter() {
+
   return (
+
     <BrowserRouter>
 
       <Routes>
 
-        {/* ===========================
-            Public Routes
-        =========================== */}
+        {/* =====================================
+                    Public Routes
+        ====================================== */}
 
         <Route
           path="/"
           element={<LoginPage />}
         />
 
-        {/* ===========================
-            Protected Routes
-        =========================== */}
+        <Route
+          path="/register"
+          element={<RegisterPage />}
+        />
+
+        {/* =====================================
+                  Protected Routes
+        ====================================== */}
+
+        {/* Dashboard */}
 
         <Route
           path="/dashboard"
@@ -41,6 +60,8 @@ export default function AppRouter() {
           }
         />
 
+        {/* Invoice Upload */}
+
         <Route
           path="/upload"
           element={
@@ -49,6 +70,8 @@ export default function AppRouter() {
             </ProtectedRoute>
           }
         />
+
+        {/* Invoice Management */}
 
         <Route
           path="/invoices"
@@ -68,9 +91,7 @@ export default function AppRouter() {
           }
         />
 
-        {/* ===========================
-            Firm Management
-        =========================== */}
+        {/* Firm Management */}
 
         <Route
           path="/firms"
@@ -81,13 +102,6 @@ export default function AppRouter() {
           }
         />
 
-        {/* ===========================
-            Future Modules
-        =========================== */}
-
-        {/* Create Firm */}
-
-        {/*
         <Route
           path="/firms/new"
           element={
@@ -96,11 +110,7 @@ export default function AppRouter() {
             </ProtectedRoute>
           }
         />
-        */}
 
-        {/* Edit Firm */}
-
-        {/*
         <Route
           path="/firms/:firmId/edit"
           element={
@@ -109,11 +119,9 @@ export default function AppRouter() {
             </ProtectedRoute>
           }
         />
-        */}
 
         {/* Export */}
 
-        {/*
         <Route
           path="/export"
           element={
@@ -122,11 +130,9 @@ export default function AppRouter() {
             </ProtectedRoute>
           }
         />
-        */}
 
         {/* Settings */}
 
-        {/*
         <Route
           path="/settings"
           element={
@@ -135,9 +141,10 @@ export default function AppRouter() {
             </ProtectedRoute>
           }
         />
-        */}
 
-        {/* Profile */}
+        {/* =====================================
+                  Future Modules
+        ====================================== */}
 
         {/*
         <Route
@@ -148,11 +155,16 @@ export default function AppRouter() {
             </ProtectedRoute>
           }
         />
-        */}
 
-        {/* 404 */}
+        <Route
+          path="/notifications"
+          element={
+            <ProtectedRoute>
+              <NotificationsPage />
+            </ProtectedRoute>
+          }
+        />
 
-        {/*
         <Route
           path="*"
           element={<NotFoundPage />}
@@ -162,5 +174,7 @@ export default function AppRouter() {
       </Routes>
 
     </BrowserRouter>
+
   );
+
 }

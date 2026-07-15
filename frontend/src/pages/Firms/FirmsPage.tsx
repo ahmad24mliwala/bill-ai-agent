@@ -1,24 +1,22 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 
-import {
-  PlusIcon,
-} from "@heroicons/react/24/outline";
-
 import Layout from "../../components/layout/Layout";
 
-import FirmSearch from "../../components/firms/FirmSearch";
-import FirmsGrid from "../../components/firms/FirmsGrid";
-import EmptyFirmState from "../../components/firms/EmptyFirmState";
-
 import {
+  deleteFirm,
   getFirms,
 } from "../../api/firms";
 
 import type {
   Firm,
-} from "../../components/firms/FirmCard";
+} from "../../api/firms";
+
+import DeleteFirmDialog from "../../components/firms/DeleteFirmDialog";
+import EmptyFirmState from "../../components/firms/EmptyFirmState";
+import FirmSearch from "../../components/firms/FirmSearch";
+import FirmsGrid from "../../components/firms/FirmsGrid";
 
 export default function FirmsPage() {
 
@@ -27,67 +25,135 @@ export default function FirmsPage() {
   const [firms, setFirms] =
     useState<Firm[]>([]);
 
+  const [filteredFirms, setFilteredFirms] =
+    useState<Firm[]>([]);
+
   const [loading, setLoading] =
     useState(true);
 
   const [search, setSearch] =
     useState("");
 
-  useEffect(() => {
+  const [selectedFirm, setSelectedFirm] =
+    useState<Firm | null>(null);
 
-    async function loadFirms() {
+  const [showDeleteDialog, setShowDeleteDialog] =
+    useState(false);
 
-      try {
+  async function loadFirms() {
 
-        const data =
-          await getFirms();
+    try {
 
-        setFirms(data);
+      setLoading(true);
 
-      } catch (error) {
+      const data =
+        await getFirms();
 
-        console.error(error);
+      setFirms(data);
 
-        toast.error(
-          "Unable to load firms."
-        );
+      setFilteredFirms(data);
 
-      } finally {
+    } catch (error) {
 
-        setLoading(false);
+      console.error(error);
 
-      }
+      toast.error(
+        "Unable to load firms."
+      );
+
+    } finally {
+
+      setLoading(false);
 
     }
+
+  }
+
+  useEffect(() => {
 
     loadFirms();
 
   }, []);
 
-  const filteredFirms =
-    useMemo(() => {
+  useEffect(() => {
 
-      const keyword =
-        search.toLowerCase();
+    const keyword =
+      search.toLowerCase();
 
-      return firms.filter((firm) =>
+    setFilteredFirms(
+
+      firms.filter((firm) =>
+
         firm.name
           .toLowerCase()
-          .includes(keyword)
-      );
+          .includes(keyword) ||
 
-    }, [
-      firms,
-      search,
-    ]);
+        (firm.gst_number ?? "")
+          .toLowerCase()
+          .includes(keyword)
+
+      )
+
+    );
+
+  }, [
+    search,
+    firms,
+  ]);
 
   function handleEdit(
-    id: string,
+    firmId: string,
   ) {
 
     navigate(
-      `/firms/${id}/edit`
+      `/firms/${firmId}/edit`
     );
+
+  }
+
+  function handleDelete(
+    firm: Firm,
+  ) {
+
+    setSelectedFirm(firm);
+
+    setShowDeleteDialog(true);
+
+  }
+
+  async function confirmDelete() {
+
+    if (!selectedFirm) {
+
+      return;
+
+    }
+
+    try {
+
+      await deleteFirm(
+        selectedFirm.id
+      );
+
+      toast.success(
+        "Firm deleted successfully."
+      );
+
+      setShowDeleteDialog(false);
+
+      setSelectedFirm(null);
+
+      await loadFirms();
+
+    } catch (error) {
+
+      console.error(error);
+
+      toast.error(
+        "Failed to delete firm."
+      );
+
+    }
 
   }
 
@@ -99,34 +165,36 @@ export default function FirmsPage() {
 
         {/* Header */}
 
-        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div className="flex flex-col items-start justify-between gap-4 md:flex-row md:items-center">
 
           <div>
 
-            <h1 className="text-4xl font-bold text-slate-800">
+            <h1 className="text-3xl font-bold">
 
               🏢 Firm Management
 
             </h1>
 
-            <p className="mt-2 text-slate-500">
+            <p className="mt-2 text-gray-500">
 
-              Manage companies that upload invoices.
+              Manage companies used for invoice
+              processing.
 
             </p>
 
           </div>
 
           <button
+
             onClick={() =>
               navigate("/firms/new")
             }
-            className="flex items-center justify-center rounded-xl bg-blue-600 px-6 py-3 font-semibold text-white transition hover:bg-blue-700"
+
+            className="rounded-xl bg-blue-600 px-6 py-3 font-semibold text-white transition hover:bg-blue-700"
+
           >
 
-            <PlusIcon className="mr-2 h-5 w-5" />
-
-            Add Firm
+            + New Firm
 
           </button>
 
@@ -135,21 +203,22 @@ export default function FirmsPage() {
         {/* Search */}
 
         <FirmSearch
+
           value={search}
+
           onChange={setSearch}
+
         />
 
-        {/* Loading */}
+        {/* Content */}
 
         {loading ? (
 
-          <div className="rounded-2xl bg-white p-16 text-center shadow">
+          <div className="rounded-2xl bg-white p-12 text-center shadow">
 
-            <div className="mx-auto mb-6 h-12 w-12 animate-spin rounded-full border-4 border-blue-600 border-t-transparent" />
+            <p className="text-lg font-medium">
 
-            <p className="text-lg font-semibold">
-
-              Loading Firms...
+              Loading firms...
 
             </p>
 
@@ -162,13 +231,38 @@ export default function FirmsPage() {
         ) : (
 
           <FirmsGrid
+
             firms={filteredFirms}
+
             onEdit={handleEdit}
+
+            onDelete={handleDelete}
+
           />
 
         )}
 
       </div>
+
+      <DeleteFirmDialog
+
+        open={showDeleteDialog}
+
+        firmName={
+          selectedFirm?.name ?? ""
+        }
+
+        onCancel={() => {
+
+          setShowDeleteDialog(false);
+
+          setSelectedFirm(null);
+
+        }}
+
+        onDelete={confirmDelete}
+
+      />
 
     </Layout>
 

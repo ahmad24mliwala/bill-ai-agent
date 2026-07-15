@@ -144,6 +144,39 @@ class InvoiceService:
         invoice.invoice_date = request.invoice_date
         invoice.total_amount = request.total_amount
 
+    # ==========================================
+    # Delete Invoice
+    # ==========================================
+
+    def delete_invoice(
+        self,
+        invoice_id: UUID,
+    ) -> bool:
+
+        invoice = self.repository.get_by_id(
+            invoice_id
+        )
+
+        if invoice is None:
+            return False
+
+        self.repository.delete(invoice)
+
+        return True
+
+    # ==========================================
+    # Delete All User Invoices
+    # ==========================================
+
+    def delete_all_invoices(
+        self,
+        user_id: UUID,
+    ) -> int:
+
+        return self.repository.delete_all_by_user(
+            user_id
+        )
+
         # Recalculate GST verification
         gst_match = False
         verification_message = "GST mismatch."

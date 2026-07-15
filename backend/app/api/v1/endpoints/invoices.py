@@ -186,3 +186,47 @@ def update_invoice(
             else json.loads(invoice.ai_response)
         ),
     )
+
+@router.delete(
+    "/{invoice_id}",
+    status_code=status.HTTP_200_OK,
+)
+def delete_invoice(
+    invoice_id: UUID,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    service = InvoiceService(db)
+
+    deleted = service.delete_invoice(
+        invoice_id
+    )
+
+    if not deleted:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Invoice not found.",
+        )
+
+    return {
+        "message": "Invoice deleted successfully."
+    }
+
+
+@router.delete(
+    "",
+    status_code=status.HTTP_200_OK,
+)
+def delete_all_invoices(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    service = InvoiceService(db)
+
+    count = service.delete_all_invoices(
+        current_user.id
+    )
+
+    return {
+        "message": f"{count} invoices deleted successfully."
+    }

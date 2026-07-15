@@ -6,10 +6,12 @@ import InvoiceRow from "./InvoiceRow";
 
 interface InvoiceTableProps {
   invoices: Invoice[];
+  onDelete: (invoiceId: string) => void;
 }
 
 export default function InvoiceTable({
   invoices,
+  onDelete,
 }: InvoiceTableProps) {
 
   return (
@@ -54,6 +56,12 @@ export default function InvoiceTable({
 
               </th>
 
+              <th className="px-6 py-4 text-center text-sm font-semibold uppercase tracking-wide text-slate-600">
+
+                Actions
+
+              </th>
+
             </tr>
 
           </thead>
@@ -67,6 +75,7 @@ export default function InvoiceTable({
                 <InvoiceRow
                   key={invoice.id}
                   invoice={invoice}
+                  onDelete={onDelete}
                 />
 
               ))
@@ -76,7 +85,7 @@ export default function InvoiceTable({
               <tr>
 
                 <td
-                  colSpan={5}
+                  colSpan={6}
                   className="py-12 text-center text-gray-500"
                 >
 
