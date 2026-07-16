@@ -229,27 +229,22 @@ bill-ai-agent
 
 ## Login
 
-> Add Screenshot Here
+![Login](screenshots/login.png)
 
 ---
 
 ## Dashboard
 
-> Add Screenshot Here
+![Dashboard](screenshots/dashboard.png)
 
 ---
 
-## Invoice Management
+## System Architecture
 
-> Add Screenshot Here
-
----
-
-## Export Report
-
-> Add Screenshot Here
+![Architecture](screenshots/architecture.png)
 
 ---
+
 
 # ⭐ Highlights
 
@@ -1022,7 +1017,7 @@ https://github.com/ahmad24mliwala
 
 LinkedIn
 
-https://linkedin.com/in/ahmadamliwala
+https://www.linkedin.com/in/ahmad-a-806237241/
 
 
 # ⭐ Support
