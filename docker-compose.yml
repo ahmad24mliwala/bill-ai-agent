@@ -1,15 +1,8 @@
-
-
 services:
-
-  # ==========================================================
-  # PostgreSQL Database
-  # ==========================================================
 
   db:
     image: postgres:16-alpine
     container_name: ai-bill-postgres
-
     restart: unless-stopped
 
     environment:
@@ -24,7 +17,7 @@ services:
       - postgres_data:/var/lib/postgresql/data
 
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d bill_ai"]
+      test: ["CMD-SHELL","pg_isready -U postgres -d bill_ai"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -32,9 +25,6 @@ services:
     networks:
       - ai-bill-network
 
-  # ==========================================================
-  # FastAPI Backend
-  # ==========================================================
 
   backend:
     build:
@@ -51,6 +41,10 @@ services:
     environment:
       DATABASE_URL: postgresql+psycopg://postgres:postgres@db:5432/bill_ai
 
+    depends_on:
+      db:
+        condition: service_healthy
+
     ports:
       - "8000:8000"
 
@@ -58,21 +52,16 @@ services:
       - ./backend/uploads:/app/uploads
       - ./backend/exports:/app/exports
 
-    depends_on:
-      db:
-        condition: service_healthy
-
     networks:
       - ai-bill-network
 
-  # ==========================================================
-  # React Frontend
-  # ==========================================================
 
   frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile
+      args:
+        VITE_API_URL: http://13.233.146.28:8000/api/v1
 
     container_name: ai-bill-frontend
 
@@ -87,19 +76,11 @@ services:
     networks:
       - ai-bill-network
 
-# ==========================================================
-# Volumes
-# ==========================================================
 
 volumes:
-
   postgres_data:
 
-# ==========================================================
-# Network
-# ==========================================================
 
 networks:
-
   ai-bill-network:
     driver: bridge
